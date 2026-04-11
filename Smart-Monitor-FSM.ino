@@ -1,16 +1,20 @@
 /*
  * Project: Smart Environment Monitor & Security Station
- * Phase: 1.0 - LCD & FSM Initialization
+ * Phase: 2.0 - Distance Sensing & State Transition
  * Developer: Hasan Ali Kinas
  */
 
 #include <LiquidCrystal.h>
 
-// LCD Pin Definitons
+// LCD Pin Definitions
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-// Finite State Machine (FSM) States
+// Sensor Pin Definitions
+const int trigPin = 9;
+const int echoPin = 10;
+
+// FSM States
 enum SystemState {
   STARTUP,
   MONITORING,
@@ -25,39 +29,75 @@ void setup() {
   Serial.begin(9600);
   lcd.begin(16, 2);
   
-  // First Opening Screen
+  // Hardware Pin Configuration
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
   lcd.setCursor(0, 0);
   lcd.print("SYSTEM STARTING");
- 
   
-  delay(2000); // A short delaying
-  currentState = MONITORING; // Switch the system to Monitoring Mode
+  delay(1500); 
+  currentState = MONITORING; 
   lcd.clear();
 }
 
 void loop() {
+  int currentDistance = readDistance();
+
   switch(currentState) {
     case MONITORING:
-      displayMonitoringStatus();
-      break;
-      
-    case ARMED:
-      // In the next stage
+      handleMonitoringState(currentDistance);
+      // Trigger Alarm if an object is closer than 10cm
+      if (currentDistance > 0 && currentDistance < 10) {
+        currentState = ALARM;
+        lcd.clear();
+      }
       break;
       
     case ALARM:
-      // In the next stage
+      handleAlarmState();
+      break;
+      
+    case ARMED:
+      // To be implemented in next phase
       break;
 
     case EMERGENCY:
-      // In the next stage
+      // To be implemented in next phase
       break;
   }
+  
+  delay(100); // Stability delay for LCD refresh
 }
 
-void displayMonitoringStatus() {
+// Function to calculate distance using HC-SR04 physics logic
+int readDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  long duration = pulseIn(echoPin, HIGH);
+  // Distance Calculation: (Time * Speed of Sound) / 2
+  // v = 0.034 cm/us
+  int distanceCm = duration * 0.034 / 2;
+  return distanceCm;
+}
+
+void handleMonitoringState(int dist) {
   lcd.setCursor(0, 0);
-  lcd.print("Mode: MONITORING");
+  lcd.print("Dist: ");
+  lcd.print(dist);
+  lcd.print(" cm    "); // Clear old digits
+  
   lcd.setCursor(0, 1);
-  lcd.print("Status: OK");
+  lcd.print("Status: SECURE ");
+}
+
+void handleAlarmState() {
+  lcd.setCursor(0, 0);
+  lcd.print("!! INTRUDER !!");
+  lcd.setCursor(0, 1);
+  lcd.print("STATE: ALARM   ");
 }
