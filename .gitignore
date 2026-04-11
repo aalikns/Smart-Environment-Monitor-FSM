@@ -1,0 +1,7 @@
+applet/
+*.elf
+*.hex
+*.o
+*.d
+*.a
+.DS_Store
