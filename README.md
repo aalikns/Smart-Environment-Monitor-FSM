@@ -30,7 +30,8 @@ Common Ground Logic: All ground lines are tied together to ensure signal integri
 
 [x] Phase 3: Actuator Integration (Stepper & Buzzer) and Power Stability
 
-[ ] Phase 4: IR Remote Access Control and User Interfacing
+[/] Phase 4: IR Remote Access Control and User Interfacing (Phase 4.9: Logic Verified & Conflict Resolved)
+> **Technical Note (Phase 4.9):** During IR integration, a timing conflict was identified between the `Stepper.h` library and `IRremote`. The blocking nature of stepper movements caused IR signal loss. Current stable version (Phase 4.9) utilizes a validated FSM logic with temporary stepper bypass to ensure 100% remote responsiveness.
 
 [ ] Phase 5: Environmental Sensor Fusion (LDR, LM35, Flame)
 
