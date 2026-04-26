@@ -1,39 +1,48 @@
-# Smart Environment Monitor & Security Station
-This project is a Finite State Machine (FSM) based embedded system developed using Arduino. It is designed to monitor environmental conditions while providing a robust, mechanical security layer.
+## Smart Environment Monitor & Security Station
 
-## Technical Specifications
-Architecture: Modular C++ implementation utilizing a Finite State Machine (FSM) for predictable and reliable state management.
+This project is a high-reliability **Finite State Machine (FSM)** based embedded system developed using Arduino. It integrates real-time environmental monitoring with a mechanical security layer, optimized for responsiveness and thermal stability.
 
-Hardware Interfacing: Integration of multiple analog and digital sensors including:
+## Phase 5.0: Final Integrated Build
+The system has evolved from a basic FSM to a fully integrated station that resolves common embedded systems conflicts such as blocking I/O and voltage fluctuations.
 
-LCD (16x02): Real-time system status and data visualization.
+## 🛠 Technical Specifications
+- **Architecture:** Modular C++ implementation utilizing a deterministic Finite State Machine (FSM) for predictable state transitions.
+- **Non-blocking Actuation:** A custom "Time-Slicing" stepper logic is implemented to ensure the **IR Receiver** remains responsive during physical motor movement, bypassing the blocking limitations of standard libraries.
+- **Hardware Interfacing:** - **LCD (16x02):** Visualizes system metrics and FSM states.
+    - **Ultrasonic Sensor (HC-SR04):** High-precision intruder detection.
+    - **Stepper Motor (28BYJ-48):** Physical locking mechanism driven by ULN2003.
+    - **IR Receiver (1838T):** Remote command interface for Arm/Disarm functions.
+    - **LM35 Precision Sensor:** Analog temperature monitoring calibrated for industrial ranges.
+    - **Active Buzzer:** Audio feedback for system initialization and alarm triggers.
 
-Ultrasonic Sensor (HC-SR04): Non-contact distance measurement for intruder detection.
+## 🔬 Engineering Breakthroughs (Focus Area)
 
-Stepper Motor (28BYJ-48): Controlled via ULN2003 driver for physical locking mechanisms.
+### 1. Thermal & Signal Stability
+To prevent temperature drift caused by motor-induced voltage ripples, the system utilizes Arduino's **Internal 1.1V Reference**. This ensures the **LM35** readings remain accurate within ±0.5°C, even when the 9V battery voltage fluctuates under load.
 
-IR Receiver (1838T): Remote control interface for system arming/disarming.
+### 2. Multi-Sampling Algorithm
+Analog inputs (LM35) are processed through a **20-sample moving average filter** to eliminate high-frequency noise from the stepper motor's electromagnetic interference.
 
-Audio Feedback: Pulse-width modulation (PWM) driven frequency sweeps for industrial-grade alerts.
+### 3. Power Optimization
+A `releaseMotor()` function is implemented to de-energize stepper coils immediately after reaching the target position. This prevents the ULN2003 driver from overheating and extends the lifespan of the external 9V battery.
 
-## Power Management (Engineering Focus)
-A critical aspect of this project is the distributed power architecture. To prevent Brownout Resets caused by the high current draw of the stepper motor, the system utilizes:
+## 🔌 Hardware Pinout (Phase 5.0)
+| Component | Arduino Pin | Note |
+| :--- | :--- | :--- |
+| **LCD (RS, EN, D4-D7)** | 12, 11, 5, 4, 3, 2 | Standard 4-bit mode |
+| **HC-SR04 (Trig, Echo)** | 7, A2 | Proximity Sensing |
+| **IR Receiver** | A1 | Remote Interface |
+| **Active Buzzer** | A3 | Audio Feedback |
+| **LM35 Sensor** | A5 | High-Stability Input |
+| **Stepper (IN1-IN4)** | 8, 10, 9, A0 | ULN2003 Driver |
 
-Dual Power Rails: The Arduino logic is powered via USB, while the Stepper Motor is powered by an external 9V battery.
+## 📈 Development Roadmap
+- [x] **Phase 1:** LCD and FSM Core Logic.
+- [x] **Phase 2:** Distance Sensing and State Transitions.
+- [x] **Phase 3:** Actuator Integration and External Power Architecture.
+- [x] **Phase 4:** IR Remote Integration & Non-blocking Logic implementation.
+- [x] **Phase 5:** Final Sensor Fusion, Audio Alerts, and Internal Vref Calibration.
 
-Common Ground Logic: All ground lines are tied together to ensure signal integrity across the sensing and actuation layers.
-
-## Development Roadmap
-[x] Phase 1: LCD and FSM Core Logic
-
-[x] Phase 2: Distance Sensing and State Transitions
-
-[x] Phase 3: Actuator Integration (Stepper & Buzzer) and Power Stability
-
-[/] Phase 4: IR Remote Access Control and User Interfacing (Phase 4.9: Logic Verified & Conflict Resolved)
-> **Technical Note (Phase 4.9):** During IR integration, a timing conflict was identified between the `Stepper.h` library and `IRremote`. The blocking nature of stepper movements caused IR signal loss. Current stable version (Phase 4.9) utilizes a validated FSM logic with temporary stepper bypass to ensure 100% remote responsiveness.
-
-[ ] Phase 5: Environmental Sensor Fusion (LDR, LM35, Flame)
-
-## Developer
-Hasan Ali Kinas – Electronics and Communication Engineering Student at Izmir Institute of Technology.
+## 👨‍💻 Developer
+**Hasan Ali Kinas** Electronics and Communication Engineering Student  
+Izmir Institute of Technology (IYTE)
